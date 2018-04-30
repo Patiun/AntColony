@@ -23,16 +23,16 @@ public class Ant_Eyes : MonoBehaviour {
 	void Update () {
 		for (int i = 0; i < eyes.Count; i++) {
 			RaycastHit hit;
+			//Debug.DrawLine (eyes [i].transform.position, eyes [i].transform.forward, Color.white);
 			if (Physics.Raycast (eyes [i].transform.position, eyes [i].transform.forward, out hit, Mathf.Infinity, layers.value)) {
 				//Debug.Log (hit.point);
-				Debug.DrawLine (eyes [i].transform.position, eyes [i].transform.forward * hit.distance, Color.yellow); //WHY is this off?
+				//Debug.DrawLine (eyes [i].transform.position, eyes [i].transform.forward * hit.distance, Color.yellow); //WHY is this off?
 				objectInRangeByEye [i] = true;
 				distancePerEye [i] = hit.distance;
 			} else {
 				objectInRangeByEye [i] = false;
 				distancePerEye [i] = 0f;
 			}
-			//Debug.Log (hit.collider.gameObject);
 		}
 	}
 
