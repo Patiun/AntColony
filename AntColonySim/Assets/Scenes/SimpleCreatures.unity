@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -124,6 +124,7 @@ GameObject:
   - component: {fileID: 153786339}
   - component: {fileID: 153786338}
   - component: {fileID: 153786337}
+  - component: {fileID: 153786341}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -197,6 +198,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &153786341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 153786336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce4c2d8b04bf5ab47a6d5534e6bc1d85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &352014516
 GameObject:
   m_ObjectHideFlags: 0
@@ -885,7 +897,7 @@ GameObject:
   - component: {fileID: 1959459237}
   - component: {fileID: 1959459236}
   m_Layer: 0
-  m_Name: Creature
+  m_Name: Stacy's Mom
   m_TagString: Creature
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1036,7 +1048,7 @@ GameObject:
   - component: {fileID: 2024014524}
   m_Layer: 0
   m_Name: Body
-  m_TagString: Untagged
+  m_TagString: Creature
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

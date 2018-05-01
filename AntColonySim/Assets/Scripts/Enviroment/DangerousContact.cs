@@ -14,9 +14,9 @@ public class DangerousContact : MonoBehaviour {
 		
 	}
 
-	public void OnTriggerEnter(Collider col) {
+	void OnTriggerEnter(Collider col) {
 		if (col.tag == "Creature") {
-			GetComponent<Creature_Brain> ().Die ();
+			col.gameObject.GetComponentInParent<Creature_Brain> ().Die ();
 		}
 	}
 }

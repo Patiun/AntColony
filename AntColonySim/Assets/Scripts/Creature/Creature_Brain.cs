@@ -10,12 +10,30 @@ public class Creature_Brain : MonoBehaviour {
 	public Creature_Mouth mouth;
 	public Creature_Muscle headMuscle;
 
+	private Model model;
+
 	// Use this for initialization
 	void Start () {
 		eyes = GetComponentInChildren<Creature_Eyes> ();
 		legs = GetComponentInChildren<Creature_Legs> ();
 		stomach = GetComponentInChildren<Creature_Stomach> ();
 		mouth = GetComponentInChildren<Creature_Mouth> ();
+
+		BuildModel ();
+	}
+
+	private void BuildModel() {
+		List<string> Sigma = new List<string> ();
+		List<string> Delta = new List<string> ();
+		List<State> states = new List<State> ();
+
+		State s = new State ("0");
+		states.Add (s);
+
+		Sigma.AddRange (new string[] {"","a"}); //Load Sigma
+		Delta.AddRange (new string[] {"","A"}); //Load Delta
+
+		model = new Model (Sigma,Delta,states,states[0]);
 	}
 	
 	// Update is called once per frame
@@ -55,7 +73,7 @@ public class Creature_Brain : MonoBehaviour {
 			stomach.AddFood (1);
 		}
 
-		/*int rand = Random.Range (0, 10);
+		int rand = Random.Range (0, 10);
 		switch (rand) {
 		case 0:
 			legs.MoveForward ();
@@ -87,10 +105,12 @@ public class Creature_Brain : MonoBehaviour {
 		case 9:
 			legs.MoveBackwards();
 			break;
-		}*/
+		}
 		if (stomach.starving) {
 			Die ();
 		}
+
+		model.TakeInput(new List<Symbol>());
 	}
 
 	public void Die() {
@@ -99,7 +119,7 @@ public class Creature_Brain : MonoBehaviour {
 	}
 
 	void GetStimuli() {
-		string[] symbols = new string[1];
+		string[] names = new string[1];
 		float[] strengths = new float[1];
 	}
 }
