@@ -30,6 +30,12 @@ public class Creature_Legs : MonoBehaviour {
 		count = 0;
 	}
 
+	public void MoveBackwards() {
+		rb.velocity = transform.forward * -0.5f * speed; //Moves slower backwards
+		lockOut = 10;
+		count = 0;
+	}
+
 	void Turn(float amt){
 		transform.parent.RotateAround (transform.position, transform.up, amt);
 

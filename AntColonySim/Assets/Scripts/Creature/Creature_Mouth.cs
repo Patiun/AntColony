@@ -21,8 +21,9 @@ public class Creature_Mouth : MonoBehaviour {
 	}
 
 	private void Eat(Consumable food) {
-		float neededFood = brain.stomach.GetNeededFood ();
-		food.Consume (consumptionSpeed * Time.deltaTime);
+		float amount = consumptionSpeed * Time.deltaTime;
+		food.Consume (amount);
+		brain.stomach.AddFood (amount);
 	}
 
 	void OnTriggerEnter(Collider col) {

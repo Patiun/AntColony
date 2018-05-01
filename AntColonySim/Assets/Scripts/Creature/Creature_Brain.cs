@@ -24,6 +24,9 @@ public class Creature_Brain : MonoBehaviour {
 		if (Input.GetKey (KeyCode.W)) {
 			legs.MoveForward ();
 		}
+		if (Input.GetKey (KeyCode.S)) {
+			legs.MoveBackwards ();
+		}
 		if (Input.GetKey (KeyCode.A)) {
 			legs.TurnLeft (1);
 		}
