@@ -55,7 +55,7 @@ public class Creature_Brain : MonoBehaviour {
 			stomach.AddFood (1);
 		}
 
-		/*int rand = Random.Range (0, 9);
+		/*int rand = Random.Range (0, 10);
 		switch (rand) {
 		case 0:
 			legs.MoveForward ();
@@ -84,7 +84,18 @@ public class Creature_Brain : MonoBehaviour {
 		case 8:
 			headMuscle.ExtendZ (5);
 			break;
+		case 9:
+			legs.MoveBackwards();
+			break;
 		}*/
+		if (stomach.starving) {
+			Die ();
+		}
+	}
+
+	public void Die() {
+		//DO THINGS FOR DEATH
+		Debug.Log("Ded");
 	}
 
 	void GetStimuli() {

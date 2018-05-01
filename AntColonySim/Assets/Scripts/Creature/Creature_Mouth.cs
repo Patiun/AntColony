@@ -23,7 +23,7 @@ public class Creature_Mouth : MonoBehaviour {
 	private void Eat(Consumable food) {
 		float amount = consumptionSpeed * Time.deltaTime;
 		food.Consume (amount);
-		brain.stomach.AddFood (amount);
+		brain.stomach.AddFood (amount); //Inately connects to the Stomach
 	}
 
 	void OnTriggerEnter(Collider col) {
