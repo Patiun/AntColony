@@ -9,6 +9,8 @@ public class Transition {
 	private string symbolName;
 	private OutputDistribution distribution; //Better name
 	private Expectation expecations;
+	private bool isTemporary;
+	private bool conditioned;
 
 	public Transition(State startState, State endState,string symbolName, List<string> Delta) {
 		this.startState = startState;
@@ -45,6 +47,22 @@ public class Transition {
 
 	public Expectation getExpectations() {
 		return expecations;
+	}
+
+	public void SetTemporary(bool status) {
+		isTemporary = status;
+	}
+
+	public bool IsTemporary() {
+		return isTemporary;
+	}
+
+	public void SetDistribution(OutputDistribution distribution) {
+		distribution = this.distribution;
+	}
+
+	public void SetConfidence(float amt) {
+		expecations.SetConfidence (amt);
 	}
 
 }

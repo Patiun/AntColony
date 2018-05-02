@@ -53,6 +53,10 @@ public class Expectation{
 		return confidence;
 	}
 
+	public void SetConfidence(float amt) {
+		confidence = amt;
+	}
+
 	public float GetExpectencyWith(Transition other) {
 		if (DoesExpectancyExistWith (other)) {
 			int index = otherTransitions.IndexOf (other);

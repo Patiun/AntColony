@@ -119,7 +119,7 @@ public class Creature_Brain : MonoBehaviour {
 	}
 
 	void GetStimuli() {
-		string[] names = new string[1];
-		float[] strengths = new float[1];
+		//string[] names = new string[1];
+		//float[] strengths = new float[1];
 	}
 }
