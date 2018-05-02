@@ -39,4 +39,11 @@ public class Creature_Eyes : MonoBehaviour {
 	public float[] GetEyeDistances() {
 		return distancePerEye;
 	}
+
+	public List<Symbol> GetStimuli() {
+		List<Symbol> symbols = new List<Symbol> ();
+		symbols.Add (new Symbol ("RightEye", distancePerEye [0]));
+		symbols.Add (new Symbol ("LeftEye",distancePerEye[1]));
+		return symbols;
+	}
 }

@@ -12,6 +12,8 @@ public class Creature_Brain : MonoBehaviour {
 
 	private Model model;
 
+	private int count;
+	private int waitTime = 100;
 	// Use this for initialization
 	void Start () {
 		eyes = GetComponentInChildren<Creature_Eyes> ();
@@ -26,12 +28,14 @@ public class Creature_Brain : MonoBehaviour {
 		List<string> Sigma = new List<string> ();
 		List<string> Delta = new List<string> ();
 		List<State> states = new List<State> ();
+		List<State> rewards = new List<State> ();
+		List<State> punishments = new List<State> ();
 
-		Sigma.AddRange (new string[] {"EPSILON","a"}); //Load Sigma
-		Delta.AddRange (new string[] {"EPSILON","A"}); //Load Delta
+		Sigma.AddRange (new string[] {"EPSILON","LeftEye","RightEye","Hungry","Starving","Eating","Dead"}); //Load Sigma
+		Delta.AddRange (new string[] {"EPSILON","MoveForward","MoveBackwards","TurnLeft","TurnRight","HeadContractX","HeadContractY","HeadContractZ","HeadExtendY","HeadExtendZ",}); //Load Delta
 
-		State s0 = new State ("0");
-		State s1 = new State ("1");
+		State s0 = new State ("0"); //Default
+		State s1 = new State ("1"); //
 		states.Add (s0);
 		states.Add (s1);
 
@@ -49,14 +53,18 @@ public class Creature_Brain : MonoBehaviour {
 		s1.AddTransition (transition1_0);
 		s0.AddTransition (transition0_0);
 
-		model = new Model (Sigma,Delta,states,s0);
+		model = new Model (Sigma,Delta,states,s0,rewards,punishments);
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		HandleDebug ();
-
-		RandomWalk ();
+		if (count >= waitTime) {
+			HandleOutput (model.TakeInput (GetStimuli ()));
+		} else {
+			count++;
+		}
+		//RandomWalk ();
 
 	}
 
@@ -67,13 +75,47 @@ public class Creature_Brain : MonoBehaviour {
 
 	public void HandleOutput(Symbol output) {
 		Debug.Log ("Output: "+output.GetName ()+" Strength: "+output.GetValue());
+		switch (output.GetName ()) {
+			case "MoveForward":
+				legs.MoveForward ();
+				break;
+			case "TurnLeft":
+				legs.TurnLeft (20*output.GetValue());
+				break;
+			case "TurnRight":
+				legs.TurnRight (20*output.GetValue());
+				break;
+			case "HeadContractX":
+				headMuscle.ContractX (5);
+				break;
+			case "HeadExtendX":
+				headMuscle.ExtendX (5);
+				break;
+			case "HeadContractY":
+				headMuscle.ContractY (5);
+				break;
+			case "HeadExtendY":
+				headMuscle.ExtendY (5);
+				break;
+			case "HeadContractZ":
+				headMuscle.ContractZ (5);
+				break;
+			case "HeadExtendZ":
+				headMuscle.ExtendZ (5);
+				break;
+			case "MoveBackwards":
+				legs.MoveBackwards();
+				break;
+			case "EPSILON":
+				count = 0;
+				break;
+		}
 	}
 
 	List<Symbol> GetStimuli() {
 		List<Symbol> stimuli = new List<Symbol> ();
-		//string[] names = new string[1];
-		//float[] strengths = new float[1];
-		stimuli.Add(new Symbol("a",1.0f));
+		stimuli.AddRange (eyes.GetStimuli ());
+		stimuli.AddRange (stomach.GetStimuli ());
 		return stimuli;
 	}
 

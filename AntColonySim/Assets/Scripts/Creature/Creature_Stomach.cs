@@ -38,6 +38,10 @@ public class Creature_Stomach : MonoBehaviour {
 		return maxStorage - food;
 	}
 
+	public float GetMaxFood() {
+		return maxStorage;
+	}
+
 	public void AddFood(float amt){
 		if (food + amt >= maxStorage) {
 			food = maxStorage;
@@ -70,5 +74,15 @@ public class Creature_Stomach : MonoBehaviour {
 		} else {
 			return 0.0f;
 		}
+	}
+
+	public List<Symbol> GetStimuli() {
+		List<Symbol> symbols = new List<Symbol> ();
+		if (hungry) {
+			symbols.Add (new Symbol ("Hunger", hungerStrength));
+		} else if (starving) {
+			symbols.Add (new Symbol ("Starving", starvingStrength));
+		}
+		return symbols;
 	}
 }

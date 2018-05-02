@@ -5,7 +5,7 @@ using System;
 
 public class Model {
 	
-	public static float[] parameters = new float[] {0.05f,0.05f,0.2f,0.1f,1.0f,0.9f,0.5f,0.5f}; //alpha,beta,gamma,zeta,eta,kappa,nu,tau
+	public static float[] parameters = new float[] {0.05f,0.05f,0.2f,0.1f,0.5f,0.9f,0.5f,0.5f}; //alpha,beta,gamma,zeta,eta,kappa,nu,tau
 
 	private List<string> Sigma;
 	private List<string> Delta;
@@ -24,7 +24,7 @@ public class Model {
 	private List<string> inputSymbols;
 	private List<string> lastInputSymbols;
 
-	public Model(List<string> Sigma, List<string> Delta, List<State> states, State startingState) {
+	public Model(List<string> Sigma, List<string> Delta, List<State> states, State startingState,List<State> rewards,List<State> punishments) {
 		this.Sigma = Sigma;
 		this.Delta = Delta;
 		this.states = states;
@@ -44,6 +44,8 @@ public class Model {
 		conditioned = new List<Transition> ();
 		inputSymbols = new List<string> ();
 		lastInputSymbols = new List<string> ();
+		reward = rewards;
+		punishment = punishments;
 
 		lastTime = Time.time;
 		timeSinceLastInput = Time.time - lastTime;
@@ -68,6 +70,7 @@ public class Model {
 		curInput = inputs;
 		if (timeSinceLastInput >= parameters [7]) {
 			Debug.Log ("[MESSAGE] Time is greater than Tau");
+			Debug.Log ("[MESSAGE] Number of states " + states.Count);
 			if (curState.TransitionIsDefined (Symbol.Epsilon.GetName ())) {
 				Transition t = curState.GetTransitionOn (Symbol.Epsilon);
 				if (t.IsTemporary ()) {
@@ -77,6 +80,7 @@ public class Model {
 				curState = curState.GetTransitionOn (Symbol.Epsilon).GetEndState();
 			}
 			anchorState = curState;
+			//Debug.Log ("[MESSAGE] Anchor State set to " + anchorState.GetName ());
 			lastSymbol = Symbol.Epsilon;
 			lastOutput = Symbol.Epsilon;
 			curOutput = Symbol.Epsilon;
@@ -84,11 +88,13 @@ public class Model {
 			markedSymbols = new List<string>();
 			return (TakeInput (inputs));
 		} else {
+			//Debug.Log ("[MESSAGE] Current state is " + curState.GetName ());
 			curSymbol = GetStrongesSymbol ();
+			Debug.Log ("Input: " + curSymbol);
 			CreateTransitions ();
 			lastOutput = curOutput;
 			Transition curTransition = curState.GetTransitionOn (curSymbol);
-			curOutput = curTransition.GetOutputDistribution ().GetOutputSymbol ((curSymbol.GetValue()*curTransition.GetConfidence())/(1+curTransition.GetConfidence()));
+			curOutput = curTransition.GetOutputDistribution ().GetOutputSymbol ((curSymbol.GetValue()*curTransition.GetConfidence())/(1+curTransition.GetConfidence())); //?????? Null here
 			markedDistributions.Push (curTransition);
 			markedSymbols.Add (lastOutput.GetName());
 			UpdateExpectations ();
@@ -136,8 +142,12 @@ public class Model {
 				newState.AddTransition (tempTransition);
 				foreach (State state in states) {
 					if (state.TransitionIsDefined (symbol.GetName ())) {
-						newTransition.SetDistribution (state.GetTransitionOn (symbol).GetOutputDistribution ());
-						newTransition.getExpectations ().SetConfidence (state.GetTransitionOn (symbol).getExpectations ().GetConfidence ());
+						Transition oldTransition = state.GetTransitionOn (symbol);
+						//Debug.Log ("[MESSAGE] Transition - " + oldTransition);
+						//Debug.Log("[MESSAGE] Distribution - "+oldTransition.GetOutputDistribution());
+						newTransition.SetDistribution (oldTransition.GetOutputDistribution ());
+						newTransition.getExpectations ().SetConfidence (oldTransition.getExpectations ().GetConfidence ());
+						//Debug.Log ("[Message] New Distribution - " + newTransition.GetOutputDistribution ());
 						if (reward.Contains (state)) {
 							reward.Add (newState);
 						} else if (punishment.Contains (state)) {

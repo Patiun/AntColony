@@ -58,11 +58,15 @@ public class Transition {
 	}
 
 	public void SetDistribution(OutputDistribution distribution) {
-		distribution = this.distribution;
+		this.distribution = distribution;
 	}
 
 	public void SetConfidence(float amt) {
 		expecations.SetConfidence (amt);
+	}
+
+	public override string ToString() {
+		return startState.GetName () + " -> " + endState.GetName ();
 	}
 
 }

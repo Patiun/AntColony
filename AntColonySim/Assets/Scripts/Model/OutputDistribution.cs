@@ -69,4 +69,12 @@ public class OutputDistribution {
 		symbols = input;
 	}
 
+	public override string ToString ()
+	{
+		string output = "";
+		foreach (Symbol symbol in symbols) {
+			output += symbol.ToString ();
+		}
+		return output;
+	}
 }
