@@ -65,4 +65,8 @@ public class OutputDistribution {
 		return -1.0f;
 	}
 
+	public void SetDistribution(List<Symbol> input) {
+		symbols = input;
+	}
+
 }
