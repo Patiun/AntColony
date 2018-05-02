@@ -5,7 +5,7 @@ using System;
 
 public class Symbol {
 
-	public static Symbol Epsilon = new Symbol (" ", 0.0f);
+	public static Symbol Epsilon = new Symbol ("EPSILON", 0.0f);
 
 	private string name;
 	private float strength;

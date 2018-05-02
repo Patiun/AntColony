@@ -67,6 +67,7 @@ public class Model {
 		lastInput = curInput;
 		curInput = inputs;
 		if (timeSinceLastInput >= parameters [7]) {
+			Debug.Log ("[MESSAGE] Time is greater than Tau");
 			if (curState.TransitionIsDefined (Symbol.Epsilon.GetName ())) {
 				Transition t = curState.GetTransitionOn (Symbol.Epsilon);
 				if (t.IsTemporary ()) {
@@ -130,7 +131,8 @@ public class Model {
 				State newState = new State ("" + states.Count);
 				Transition newTransition = new Transition (curState, newState, symbol.GetName(), Delta);
 				Transition tempTransition = new Transition (newState, anchorState, Symbol.Epsilon.GetName (), Delta);
-				newState.AddTransition (newTransition);
+				tempTransition.SetTemporary (true);
+				curState.AddTransition (newTransition);
 				newState.AddTransition (tempTransition);
 				foreach (State state in states) {
 					if (state.TransitionIsDefined (symbol.GetName ())) {
@@ -152,47 +154,51 @@ public class Model {
 	public void UpdateExpectations() {
 		Transition currentTransition = curState.GetTransitionOn (curSymbol);
 		Transition lastTransition = lastState.GetTransitionOn (lastSymbol);
-
-		if (lastTransition.getExpectations ().DoesExpectancyExistWith (currentTransition)) {
-			lastTransition.getExpectations ().StrengthenExpectencyWith (currentTransition);
-			currentTransition.getExpectations ().StrengthenExpectencyWith (lastTransition);
-		} else {
-			lastTransition.getExpectations ().CreateExpectancyWith (currentTransition);
-			currentTransition.getExpectations ().CreateExpectancyWith (lastTransition);
-		}
-
-		foreach (string name in Sigma) {
-			Symbol symbol = new Symbol (name, 0.0f);
-			Transition symbolTransition = curState.GetTransitionOn (symbol);
-			if (lastTransition.getExpectations ().DoesExpectancyExistWith (symbolTransition) && !inputSymbols.Contains(name)) {
-				lastTransition.getExpectations ().WeakenExpectencyWith (symbolTransition);
-				symbolTransition.getExpectations ().WeakenExpectencyWith (lastTransition);
+		if (lastTransition != null) {
+			if (lastTransition.getExpectations ().DoesExpectancyExistWith (currentTransition)) {
+				lastTransition.getExpectations ().StrengthenExpectencyWith (currentTransition);
+				currentTransition.getExpectations ().StrengthenExpectencyWith (lastTransition);
+			} else {
+				lastTransition.getExpectations ().CreateExpectancyWith (currentTransition);
+				currentTransition.getExpectations ().CreateExpectancyWith (lastTransition);
 			}
-			foreach (State state in states) {
-				if (state != lastState && name != lastSymbol.GetName ()) {
-					Transition anyTransition = state.GetTransitionOn (symbol);
-					if (lastTransition.getExpectations ().DoesExpectancyExistWith (anyTransition)) {
-						lastTransition.getExpectations ().WeakenExpectencyWith (anyTransition);
-						anyTransition.getExpectations ().WeakenExpectencyWith (lastTransition);
+
+			foreach (string name in Sigma) {
+				Symbol symbol = new Symbol (name, 0.0f);
+				Transition symbolTransition = curState.GetTransitionOn (symbol);
+				if (symbolTransition != null) {
+					if (lastTransition.getExpectations ().DoesExpectancyExistWith (symbolTransition) && !inputSymbols.Contains (name)) {
+						lastTransition.getExpectations ().WeakenExpectencyWith (symbolTransition);
+						symbolTransition.getExpectations ().WeakenExpectencyWith (lastTransition);
 					}
-				}
-			}
-			foreach (string nameB in Sigma) {
-				if (name != nameB) {
-					Symbol symbolB = new Symbol (nameB, 0.0f);
-					Transition aTransition = curState.GetTransitionOn (symbol);
-					Transition bTransition = curState.GetTransitionOn (symbolB);
-					if (inputSymbols.Contains (name) && inputSymbols.Contains (nameB)) {
-						if (aTransition.getExpectations ().DoesExpectancyExistWith (bTransition)) {
-							aTransition.getExpectations ().StrengthenExpectencyWith (aTransition);
-							bTransition.getExpectations ().StrengthenExpectencyWith (bTransition);
-						} else {
-							aTransition.getExpectations ().CreateExpectancyWith (bTransition);
-							bTransition.getExpectations ().CreateExpectancyWith (aTransition);
+					foreach (State state in states) {
+						if (state != lastState && name != lastSymbol.GetName ()) {
+							Transition anyTransition = state.GetTransitionOn (symbol);
+							if (lastTransition.getExpectations ().DoesExpectancyExistWith (anyTransition)) {
+								lastTransition.getExpectations ().WeakenExpectencyWith (anyTransition);
+								anyTransition.getExpectations ().WeakenExpectencyWith (lastTransition);
+							}
 						}
-					} else if (inputSymbols.Contains (name) || inputSymbols.Contains (nameB)) {if (aTransition.getExpectations ().DoesExpectancyExistWith (bTransition)) {
-							aTransition.getExpectations ().WeakenExpectencyWith (aTransition);
-							bTransition.getExpectations ().WeakenExpectencyWith (bTransition);
+					}
+					foreach (string nameB in Sigma) {
+						if (name != nameB) {
+							Symbol symbolB = new Symbol (nameB, 0.0f);
+							Transition aTransition = curState.GetTransitionOn (symbol);
+							Transition bTransition = curState.GetTransitionOn (symbolB);
+							if (inputSymbols.Contains (name) && inputSymbols.Contains (nameB)) {
+								if (aTransition.getExpectations ().DoesExpectancyExistWith (bTransition)) {
+									aTransition.getExpectations ().StrengthenExpectencyWith (aTransition);
+									bTransition.getExpectations ().StrengthenExpectencyWith (bTransition);
+								} else {
+									aTransition.getExpectations ().CreateExpectancyWith (bTransition);
+									bTransition.getExpectations ().CreateExpectancyWith (aTransition);
+								}
+							} else if (inputSymbols.Contains (name) || inputSymbols.Contains (nameB)) {
+								if (aTransition.getExpectations ().DoesExpectancyExistWith (bTransition)) {
+									aTransition.getExpectations ().WeakenExpectencyWith (aTransition);
+									bTransition.getExpectations ().WeakenExpectencyWith (bTransition);
+								}
+							}
 						}
 					}
 				}
@@ -206,7 +212,7 @@ public class Model {
 				Symbol symbol = new Symbol (name, 0.0f);
 				Transition lastTransition = lastState.GetTransitionOn (lastSymbol);
 				Transition symbolTransition = lastState.GetTransitionOn (symbol);
-				if (lastInputSymbols.Contains (name)) {
+				if (lastInputSymbols.Contains (name) && symbolTransition != null) {
 					if (lastTransition.getExpectations ().DoesExpectancyExistWith (symbolTransition)) {
 						float change = parameters [2] * curSymbol.GetValue () / symbolTransition.GetConfidence ();
 						symbolTransition.GetOutputDistribution ().UpdateSymbolProbability (lastOutput.GetName(), change);
@@ -219,7 +225,7 @@ public class Model {
 				}
 				foreach (State state in states) {
 					Transition seekingTransition = state.GetTransitionOn (symbol);
-					if (seekingTransition.GetEndState () == lastState) {
+					if (seekingTransition != null && seekingTransition.GetEndState () == lastState) {
 						if (lastTransition.getExpectations ().DoesExpectancyExistWith (seekingTransition)) {
 							float change = parameters [2] * curSymbol.GetValue () / seekingTransition.GetConfidence ();
 							seekingTransition.GetOutputDistribution ().UpdateSymbolProbability (lastOutput.GetName(), change);

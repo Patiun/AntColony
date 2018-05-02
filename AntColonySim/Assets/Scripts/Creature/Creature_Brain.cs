@@ -27,8 +27,8 @@ public class Creature_Brain : MonoBehaviour {
 		List<string> Delta = new List<string> ();
 		List<State> states = new List<State> ();
 
-		Sigma.AddRange (new string[] {"","a"}); //Load Sigma
-		Delta.AddRange (new string[] {"","A"}); //Load Delta
+		Sigma.AddRange (new string[] {"EPSILON","a"}); //Load Sigma
+		Delta.AddRange (new string[] {"EPSILON","A"}); //Load Delta
 
 		State s0 = new State ("0");
 		State s1 = new State ("1");
@@ -37,14 +37,19 @@ public class Creature_Brain : MonoBehaviour {
 
 		Transition transition0_1 = new Transition (s0, s1, "a", Delta);
 		Transition transition1_0 = new Transition (s1, s0, Symbol.Epsilon.GetName (), Delta);
-		List<Symbol> output0_1 = new List<Symbol> {new Symbol("",0.0f),new Symbol("A",1.0f) };
-		List<Symbol> output1_0 = new List<Symbol> {new Symbol("",1.0f),new Symbol("A",0.0f) };
+		Transition transition0_0 = new Transition (s0, s0, Symbol.Epsilon.GetName (), Delta);
+		List<Symbol> output0_1 = new List<Symbol> {new Symbol("EPSILON",0.0f),new Symbol("A",1.0f) };
+		List<Symbol> output1_0 = new List<Symbol> {new Symbol("EPSILON",1.0f),new Symbol("A",0.0f) };
 		transition0_1.GetOutputDistribution ().SetDistribution (output0_1);
 		transition1_0.GetOutputDistribution ().SetDistribution (output1_0);
+		transition0_0.getExpectations ().SetConfidence (100);
+		transition0_1.getExpectations ().SetConfidence (100);
+		transition1_0.getExpectations ().SetConfidence (100);
 		s0.AddTransition (transition0_1);
 		s1.AddTransition (transition1_0);
+		s0.AddTransition (transition0_0);
 
-		model = new Model (Sigma,Delta,states,states[0]);
+		model = new Model (Sigma,Delta,states,s0);
 	}
 	
 	// Update is called once per frame
@@ -53,7 +58,6 @@ public class Creature_Brain : MonoBehaviour {
 
 		RandomWalk ();
 
-		HandleOutput(model.TakeInput(new List<Symbol>()));
 	}
 
 	public void Die() {
@@ -62,7 +66,7 @@ public class Creature_Brain : MonoBehaviour {
 	}
 
 	public void HandleOutput(Symbol output) {
-		Debug.Log ("Output: "+output.GetName ()+" Streangth: "+output.GetValue());
+		Debug.Log ("Output: "+output.GetName ()+" Strength: "+output.GetValue());
 	}
 
 	List<Symbol> GetStimuli() {
@@ -114,6 +118,9 @@ public class Creature_Brain : MonoBehaviour {
 
 	public void HandleDebug() {
 		//Debug
+		if (Input.GetKeyDown (KeyCode.Return)) {
+			HandleOutput(model.TakeInput(GetStimuli()));
+		}
 		if (Input.GetKey (KeyCode.W)) {
 			legs.MoveForward ();
 		}
