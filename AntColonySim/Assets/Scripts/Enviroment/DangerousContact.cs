@@ -17,6 +17,8 @@ public class DangerousContact : MonoBehaviour {
 	void OnTriggerEnter(Collider col) {
 		if (col.tag == "Creature") {
 			col.gameObject.GetComponentInParent<Creature_Brain> ().Die ();
+		} else if (col.tag == "Food") {
+			col.gameObject.GetComponent<Consumable> ().Remove ();
 		}
 	}
 }

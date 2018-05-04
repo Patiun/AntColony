@@ -16,7 +16,7 @@ public class Consumable : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (foodValue <= 0) {
-			Destroy (this.gameObject);
+			Remove ();
 		}
 
 		if (scaling) {
@@ -36,5 +36,11 @@ public class Consumable : MonoBehaviour {
 
 	public float GetFoodValue() {
 		return foodValue;
+	}
+
+	public void Remove() {
+		GameObject controller = GameObject.FindGameObjectWithTag ("EnviromentController");
+		controller.GetComponent<EnviromentController> ().NewFood ();
+		Destroy (this.gameObject);
 	}
 }

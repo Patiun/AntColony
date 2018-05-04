@@ -53,7 +53,9 @@ public class Creature_Mouth : MonoBehaviour {
 
 	public List<Symbol> GetStimuli() {
 		List<Symbol> symbols = new List<Symbol> ();
-		symbols.Add (new Symbol ("Eating",1-brain.stomach.GetNeededFood()/brain.stomach.GetMaxFood()));
+		if (objectBeingEaten != null) {
+			symbols.Add (new Symbol ("Eating", 1 - brain.stomach.GetNeededFood () / brain.stomach.GetMaxFood ()));
+		}
 		return symbols;
 	}
 }

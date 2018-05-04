@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+[System.Serializable]
 public class Model {
 	
 	public static float[] parameters = new float[] {0.05f,0.05f,0.2f,0.1f,0.15f,0.9f,0.5f,0.5f}; //alpha,beta,gamma,zeta,eta,kappa,nu,tau
@@ -105,6 +106,7 @@ public class Model {
 			//Debug.Log ("[MESSAGE] Current state is " + curState.GetName ());
 			curSymbol = GetStrongesSymbol ();
 			Debug.Log ("Input: " + curSymbol);
+			Debug.Log ("Input Size: " + curInput.Count);
 			CreateTransitions ();
 			lastOutput = curOutput;
 			Transition curTransition = curState.GetTransitionOn (curSymbol);
@@ -134,7 +136,7 @@ public class Model {
 		lastInputSymbols = new List<string> ();
 		Symbol strongest = new Symbol(Symbol.Epsilon.GetName(),0.0f);
 		foreach (Symbol symbol in curInput) {
-			if (symbol.GetValue () > strongest.GetValue ()) {
+			if (symbol.GetValue () >= strongest.GetValue ()) {
 				strongest = symbol;
 			}
 			inputSymbols.Add (symbol.GetName ());
@@ -149,6 +151,7 @@ public class Model {
 			}
 		}
 		foreach (Symbol symbol in curInput) {
+			//Debug.Log ("CREATE " + symbol);
 			if (!curState.TransitionIsDefined (symbol.GetName())) {
 				//Debug.Log("Creating "+symbol + " on "+curState.GetName());
 				State newState = new State ("" + states.Count);
@@ -322,7 +325,11 @@ public class Model {
 				}
 			}
 			t *= parameters [7];
-			marked = markedDistributions.Pop ();
+			if (markedDistributions.Count > 0) {
+				marked = markedDistributions.Pop ();
+			} else {
+				marked = null;
+			}
 		}
 		markedSymbols = new List<String> ();
 	}
@@ -345,7 +352,11 @@ public class Model {
 				}
 			}
 			t *= parameters [7];
-			marked = markedDistributions.Pop ();
+			if (markedDistributions.Count > 0) {
+				marked = markedDistributions.Pop ();
+			} else {
+				marked = null;
+			}
 		}
 		markedSymbols = new List<String> ();
 	}

@@ -35,7 +35,7 @@ public class Creature_Brain : MonoBehaviour {
 		List<State> rewards = new List<State> ();
 		List<State> punishments = new List<State> ();
 
-		Sigma.AddRange (new string[] {"EPSILON","LeftEye","RightEye","Hungry","Starving","Eating","Dead"}); //Load Sigma
+		Sigma.AddRange (new string[] {"EPSILON","LeftEyeFood","LeftEyeGround","LeftEyeDefault","LeftEyeDanger","LeftEyeCreature","RightEyeDefault","RightEyeGround","RightEyeDanger","RightEyeCreature","Hungry","Starving","Eating","Dead"}); //Load Sigma
 		Delta.AddRange (new string[] {"EPSILON","MoveForward","MoveBackwards","TurnLeft","TurnRight","HeadContractX","HeadContractY","HeadContractZ","HeadExtendY","HeadExtendZ",}); //Load Delta
 
 		State s0 = new State ("0"); //Default
@@ -43,12 +43,16 @@ public class Creature_Brain : MonoBehaviour {
 		State s2 = new State ("2"); //Punishment Hungry
 		State s3 = new State ("3"); //Punishment Starving
 		State s4 = new State ("4"); //Punishment Dead
-		states.AddRange(new State[] {s0,s1,s2,s3,s4});
-		rewards.AddRange (new State[] {s1});
+		State s5 = new State ("5"); //Reward See food in Right Eye;
+		State s6 = new State ("6"); //Reward See food in Left Eye;
+		states.AddRange(new State[] {s0,s1,s2,s3,s4,s5,s6});
+		rewards.AddRange (new State[] {s1,s5,s6});
 		punishments.AddRange (new State[] {s2,s3,s4});
 
 		Transition transition0_0 = new Transition (s0, s0, Symbol.Epsilon.GetName (), Delta);
 		Transition transition0_1 = new Transition (s0, s1, "Eating", Delta);
+		Transition transition0_5 = new Transition (s0, s5, "LeftEyeFood", Delta);
+		Transition transition0_6 = new Transition (s0, s6, "LeftEyeFood", Delta);
 		Transition transition0_2 = new Transition (s0, s2, "Hungry", Delta);
 		Transition transition0_3 = new Transition (s0, s3, "Starving", Delta);
 		Transition transition0_4 = new Transition (s0, s4, "Dead", Delta);
@@ -68,11 +72,15 @@ public class Creature_Brain : MonoBehaviour {
 		transition0_2.getExpectations ().SetConfidence (10000);
 		transition0_3.getExpectations ().SetConfidence (10000);
 		transition0_4.getExpectations ().SetConfidence (10000);
+		transition0_5.getExpectations ().SetConfidence (10000);
+		transition0_6.getExpectations ().SetConfidence (10000);
 		s0.AddTransition (transition0_0);
 		s0.AddTransition (transition0_1);
 		s0.AddTransition (transition0_2);
 		s0.AddTransition (transition0_3);
 		s0.AddTransition (transition0_4);
+		s0.AddTransition (transition0_5);
+		s0.AddTransition (transition0_6);
 
 		model = new Model (Sigma,Delta,states,s0,rewards,punishments);
 	}
@@ -101,12 +109,12 @@ public class Creature_Brain : MonoBehaviour {
 		//DO THINGS FOR DEATH
 		model.TakeInput(new List<Symbol>() {new Symbol("Dead",1.0f)});
 		cc.NextGeneration (model);
-		Debug.Log("Dead");
+		Debug.Log("!!! Dead");
 		Destroy (this.gameObject);
 	}
 
 	public void HandleOutput(Symbol output) {
-		Debug.Log ("Output: "+output.GetName ()+" Strength: "+output.GetValue());
+		//Debug.Log ("Output: "+output.GetName ()+" Strength: "+output.GetValue());
 		switch (output.GetName ()) {
 			case "MoveForward":
 				legs.MoveForward ();
@@ -148,8 +156,9 @@ public class Creature_Brain : MonoBehaviour {
 		List<Symbol> stimuli = new List<Symbol> ();
 		stimuli.AddRange (eyes.GetStimuli ());
 		stimuli.AddRange (stomach.GetStimuli ());
+		stimuli.AddRange (mouth.GetStimuli ());
 		if (stimuli.Count <= 0) {
-			Debug.Log ("!!!!!!!!! No Stimuli");
+			//Debug.Log ("!!!!!!!!! No Stimuli");
 			stimuli.Add (Symbol.Epsilon);
 		}
 		//foreach (Symbol s in stimuli) {

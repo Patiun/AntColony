@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+[System.Serializable]
 public class Symbol {
 
 	public static Symbol Epsilon = new Symbol ("EPSILON", 1.0f);

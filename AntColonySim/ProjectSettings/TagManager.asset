@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Creature
   - Food
+  - Ground
+  - Danger
+  - EnviromentController
   layers:
   - Default
   - TransparentFX

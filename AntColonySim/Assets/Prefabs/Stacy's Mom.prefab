@@ -589,9 +589,8 @@ MonoBehaviour:
   layers:
     serializedVersion: 2
     m_Bits: 273
-  visionRange: 0
-  maxSeen: 0
-  offset: 0
+  sightRange: 10
+  offset: 0.2
 --- !u!114 &114370424247344194
 MonoBehaviour:
   m_ObjectHideFlags: 1
