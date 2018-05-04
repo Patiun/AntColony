@@ -105,8 +105,8 @@ public class Model {
 		} else {
 			//Debug.Log ("[MESSAGE] Current state is " + curState.GetName ());
 			curSymbol = GetStrongesSymbol ();
-			Debug.Log ("Input: " + curSymbol);
-			Debug.Log ("Input Size: " + curInput.Count);
+			//Debug.Log ("Input: " + curSymbol);
+			//Debug.Log ("Input Size: " + curInput.Count);
 			CreateTransitions ();
 			lastOutput = curOutput;
 			Transition curTransition = curState.GetTransitionOn (curSymbol);
