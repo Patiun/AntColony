@@ -9,6 +9,8 @@ public class Creature_Eyes : MonoBehaviour {
 	private float[] distancePerEye;
 	public LayerMask layers;
 	public float visionRange;
+	public float maxSeen;
+	public float offset;
 
 	// Use this for initialization
 	void Start () {
@@ -22,12 +24,16 @@ public class Creature_Eyes : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+		maxSeen = 0;
 		for (int i = 0; i < eyes.Count; i++) {
 			RaycastHit hit;
 			Debug.DrawRay (eyes [i].transform.position, eyes [i].transform.forward, Color.white);
 			if (Physics.Raycast (eyes [i].transform.position, eyes [i].transform.forward, out hit, Mathf.Infinity, layers.value)) {
 				Debug.DrawRay (eyes [i].transform.position, eyes [i].transform.forward * hit.distance, Color.yellow); //WHY is this off?
 				objectInRangeByEye [i] = true;
+				if (hit.distance > maxSeen) {
+					maxSeen = hit.distance;
+				}
 				distancePerEye [i] = hit.distance;
 			} else {
 				objectInRangeByEye [i] = false;
@@ -42,8 +48,12 @@ public class Creature_Eyes : MonoBehaviour {
 
 	public List<Symbol> GetStimuli() {
 		List<Symbol> symbols = new List<Symbol> ();
-		symbols.Add (new Symbol ("RightEye", distancePerEye [0]));
-		symbols.Add (new Symbol ("LeftEye",distancePerEye[1]));
+		if (distancePerEye [0] > 0) {
+			symbols.Add (new Symbol ("RightEye", (maxSeen - distancePerEye [0] + offset)/(maxSeen  + offset)));
+		}
+		if (distancePerEye [1] > 0) {
+			symbols.Add (new Symbol ("LeftEye", (maxSeen - distancePerEye [1]  + offset)/(maxSeen  + offset)));
+		}
 		return symbols;
 	}
 }

@@ -5,7 +5,7 @@ using System;
 
 public class Model {
 	
-	public static float[] parameters = new float[] {0.05f,0.05f,0.2f,0.1f,0.5f,0.9f,0.5f,0.5f}; //alpha,beta,gamma,zeta,eta,kappa,nu,tau
+	public static float[] parameters = new float[] {0.05f,0.05f,0.2f,0.1f,0.15f,0.9f,0.5f,0.5f}; //alpha,beta,gamma,zeta,eta,kappa,nu,tau
 
 	private List<string> Sigma;
 	private List<string> Delta;
@@ -35,8 +35,6 @@ public class Model {
 		curOutput = Symbol.Epsilon;
 		curSymbol = Symbol.Epsilon;
 		lastSymbol = Symbol.Epsilon;
-		reward = new List<State> ();
-		punishment = new List<State> ();
 		curInput = new List<Symbol> ();
 		lastInput = new List<Symbol> ();
 		markedDistributions = new Stack<Transition> ();
@@ -59,8 +57,24 @@ public class Model {
 		return Delta.Contains (o.GetName ());
 	}
 
-	public Symbol GetOutput() {
-		return null;
+	public void RestartModel() {
+		curState = states[0];
+		anchorState = curState;
+		lastState = curState;
+		lastOutput = Symbol.Epsilon;
+		curOutput = Symbol.Epsilon;
+		curSymbol = Symbol.Epsilon;
+		lastSymbol = Symbol.Epsilon;
+		curInput = new List<Symbol> ();
+		lastInput = new List<Symbol> ();
+		markedDistributions = new Stack<Transition> ();
+		markedSymbols = new List<string>();
+		conditioned = new List<Transition> ();
+		inputSymbols = new List<string> ();
+		lastInputSymbols = new List<string> ();
+
+		lastTime = Time.time;
+		timeSinceLastInput = Time.time - lastTime;
 	}
 
 	public Symbol TakeInput(List<Symbol> inputs) {
@@ -94,7 +108,9 @@ public class Model {
 			CreateTransitions ();
 			lastOutput = curOutput;
 			Transition curTransition = curState.GetTransitionOn (curSymbol);
-			Debug.Log (curState);
+			if (curTransition == null) {
+				Debug.LogWarning (curState);
+			}
 			curOutput = curTransition.GetOutputDistribution ().GetOutputSymbol ((curSymbol.GetValue()*curTransition.GetConfidence())/(1+curTransition.GetConfidence())); //?????? Null here
 			markedDistributions.Push (curTransition);
 			markedSymbols.Add (lastOutput.GetName());
@@ -116,26 +132,25 @@ public class Model {
 	private Symbol GetStrongesSymbol() {
 		inputSymbols = new List<string> ();
 		lastInputSymbols = new List<string> ();
-		Symbol strongest = Symbol.Epsilon;
+		Symbol strongest = new Symbol(Symbol.Epsilon.GetName(),0.0f);
 		foreach (Symbol symbol in curInput) {
 			if (symbol.GetValue () > strongest.GetValue ()) {
 				strongest = symbol;
 			}
 			inputSymbols.Add (symbol.GetName ());
 		}
-		foreach (Symbol symbol in lastInput) {
-			lastInputSymbols.Add (symbol.GetName ());
-		}
 		return strongest;
 	}
 
 	public void CreateTransitions() {
 		if (curState.TransitionIsDefined (Symbol.Epsilon.GetName ())) {
-			curState.RemoveTransitionOn (Symbol.Epsilon.GetName ());
+			if (curState.GetTransitionOn(Symbol.Epsilon).IsTemporary()) {
+				curState.RemoveTransitionOn (Symbol.Epsilon.GetName ());
+			}
 		}
 		foreach (Symbol symbol in curInput) {
 			if (!curState.TransitionIsDefined (symbol.GetName())) {
-				Debug.Log("Creating "+symbol + " on "+curState.GetName());
+				//Debug.Log("Creating "+symbol + " on "+curState.GetName());
 				State newState = new State ("" + states.Count);
 				Transition newTransition = new Transition (curState, newState, symbol.GetName(), Delta);
 

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Creature_Brain : MonoBehaviour {
+
+	public CreatureController cc;
 	
 	public Creature_Eyes eyes;
 	public Creature_Legs legs;
@@ -12,7 +14,7 @@ public class Creature_Brain : MonoBehaviour {
 
 	private Model model;
 
-	private int count;
+	private int count = 100;
 	private int waitTime = 100;
 	// Use this for initialization
 	void Start () {
@@ -20,6 +22,8 @@ public class Creature_Brain : MonoBehaviour {
 		legs = GetComponentInChildren<Creature_Legs> ();
 		stomach = GetComponentInChildren<Creature_Stomach> ();
 		mouth = GetComponentInChildren<Creature_Mouth> ();
+
+		cc = GameObject.FindGameObjectWithTag ("GameController").GetComponent<CreatureController> ();
 
 		BuildModel ();
 	}
@@ -50,7 +54,7 @@ public class Creature_Brain : MonoBehaviour {
 		Transition transition0_4 = new Transition (s0, s4, "Dead", Delta);
 
 		List<Symbol> output0_0 = new List<Symbol>();
-		output0_0.Add (Symbol.Epsilon);
+		output0_0.Add (new Symbol (Symbol.Epsilon.GetName(),1.0f));
 		foreach (string name in Delta) {
 			if (name != Symbol.Epsilon.GetName()) {
 				Symbol symbol = new Symbol(name,0f);
@@ -58,7 +62,7 @@ public class Creature_Brain : MonoBehaviour {
 			}
 		}
 
-		transition0_0.GetOutputDistribution ().SetDistribution (output0_0);
+		//transition0_0.GetOutputDistribution ().SetDistribution (output0_0);
 		transition0_0.getExpectations ().SetConfidence (10000);
 		transition0_1.getExpectations ().SetConfidence (10000);
 		transition0_2.getExpectations ().SetConfidence (10000);
@@ -75,6 +79,9 @@ public class Creature_Brain : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (stomach.starving) {
+			Die ();
+		}
 		HandleDebug ();
 		if (count >= waitTime) {
 			HandleOutput (model.TakeInput (GetStimuli ()));
@@ -85,9 +92,17 @@ public class Creature_Brain : MonoBehaviour {
 
 	}
 
+	public void PassModel(Model model) {
+		this.model = model;
+		model.RestartModel ();
+	}
+
 	public void Die() {
 		//DO THINGS FOR DEATH
+		model.TakeInput(new List<Symbol>() {new Symbol("Dead",1.0f)});
+		cc.NextGeneration (model);
 		Debug.Log("Dead");
+		Destroy (this.gameObject);
 	}
 
 	public void HandleOutput(Symbol output) {
@@ -133,9 +148,13 @@ public class Creature_Brain : MonoBehaviour {
 		List<Symbol> stimuli = new List<Symbol> ();
 		stimuli.AddRange (eyes.GetStimuli ());
 		stimuli.AddRange (stomach.GetStimuli ());
-		if (stimuli.Count == 0) {
+		if (stimuli.Count <= 0) {
+			Debug.Log ("!!!!!!!!! No Stimuli");
 			stimuli.Add (Symbol.Epsilon);
 		}
+		//foreach (Symbol s in stimuli) {
+		//	Debug.Log (s);
+		//}
 		return stimuli;
 	}
 
