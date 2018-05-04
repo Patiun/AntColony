@@ -66,7 +66,7 @@ public class Transition {
 	}
 
 	public override string ToString() {
-		return startState.GetName () + " -> " + endState.GetName ();
+		return startState.GetName () + " --("+symbolName+")--> " + endState.GetName ();
 	}
 
 }

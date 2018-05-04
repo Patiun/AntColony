@@ -94,6 +94,7 @@ public class Model {
 			CreateTransitions ();
 			lastOutput = curOutput;
 			Transition curTransition = curState.GetTransitionOn (curSymbol);
+			Debug.Log (curState);
 			curOutput = curTransition.GetOutputDistribution ().GetOutputSymbol ((curSymbol.GetValue()*curTransition.GetConfidence())/(1+curTransition.GetConfidence())); //?????? Null here
 			markedDistributions.Push (curTransition);
 			markedSymbols.Add (lastOutput.GetName());
@@ -134,8 +135,10 @@ public class Model {
 		}
 		foreach (Symbol symbol in curInput) {
 			if (!curState.TransitionIsDefined (symbol.GetName())) {
+				Debug.Log("Creating "+symbol + " on "+curState.GetName());
 				State newState = new State ("" + states.Count);
 				Transition newTransition = new Transition (curState, newState, symbol.GetName(), Delta);
+
 				Transition tempTransition = new Transition (newState, anchorState, Symbol.Epsilon.GetName (), Delta);
 				tempTransition.SetTemporary (true);
 				curState.AddTransition (newTransition);

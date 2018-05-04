@@ -35,23 +35,40 @@ public class Creature_Brain : MonoBehaviour {
 		Delta.AddRange (new string[] {"EPSILON","MoveForward","MoveBackwards","TurnLeft","TurnRight","HeadContractX","HeadContractY","HeadContractZ","HeadExtendY","HeadExtendZ",}); //Load Delta
 
 		State s0 = new State ("0"); //Default
-		State s1 = new State ("1"); //
-		states.Add (s0);
-		states.Add (s1);
+		State s1 = new State ("1"); //Reward Eating
+		State s2 = new State ("2"); //Punishment Hungry
+		State s3 = new State ("3"); //Punishment Starving
+		State s4 = new State ("4"); //Punishment Dead
+		states.AddRange(new State[] {s0,s1,s2,s3,s4});
+		rewards.AddRange (new State[] {s1});
+		punishments.AddRange (new State[] {s2,s3,s4});
 
-		Transition transition0_1 = new Transition (s0, s1, "a", Delta);
-		Transition transition1_0 = new Transition (s1, s0, Symbol.Epsilon.GetName (), Delta);
 		Transition transition0_0 = new Transition (s0, s0, Symbol.Epsilon.GetName (), Delta);
-		List<Symbol> output0_1 = new List<Symbol> {new Symbol("EPSILON",0.0f),new Symbol("A",1.0f) };
-		List<Symbol> output1_0 = new List<Symbol> {new Symbol("EPSILON",1.0f),new Symbol("A",0.0f) };
-		transition0_1.GetOutputDistribution ().SetDistribution (output0_1);
-		transition1_0.GetOutputDistribution ().SetDistribution (output1_0);
-		transition0_0.getExpectations ().SetConfidence (100);
-		transition0_1.getExpectations ().SetConfidence (100);
-		transition1_0.getExpectations ().SetConfidence (100);
-		s0.AddTransition (transition0_1);
-		s1.AddTransition (transition1_0);
+		Transition transition0_1 = new Transition (s0, s1, "Eating", Delta);
+		Transition transition0_2 = new Transition (s0, s2, "Hungry", Delta);
+		Transition transition0_3 = new Transition (s0, s3, "Starving", Delta);
+		Transition transition0_4 = new Transition (s0, s4, "Dead", Delta);
+
+		List<Symbol> output0_0 = new List<Symbol>();
+		output0_0.Add (Symbol.Epsilon);
+		foreach (string name in Delta) {
+			if (name != Symbol.Epsilon.GetName()) {
+				Symbol symbol = new Symbol(name,0f);
+				output0_0.Add(symbol);
+			}
+		}
+
+		transition0_0.GetOutputDistribution ().SetDistribution (output0_0);
+		transition0_0.getExpectations ().SetConfidence (10000);
+		transition0_1.getExpectations ().SetConfidence (10000);
+		transition0_2.getExpectations ().SetConfidence (10000);
+		transition0_3.getExpectations ().SetConfidence (10000);
+		transition0_4.getExpectations ().SetConfidence (10000);
 		s0.AddTransition (transition0_0);
+		s0.AddTransition (transition0_1);
+		s0.AddTransition (transition0_2);
+		s0.AddTransition (transition0_3);
+		s0.AddTransition (transition0_4);
 
 		model = new Model (Sigma,Delta,states,s0,rewards,punishments);
 	}
@@ -116,6 +133,9 @@ public class Creature_Brain : MonoBehaviour {
 		List<Symbol> stimuli = new List<Symbol> ();
 		stimuli.AddRange (eyes.GetStimuli ());
 		stimuli.AddRange (stomach.GetStimuli ());
+		if (stimuli.Count == 0) {
+			stimuli.Add (Symbol.Epsilon);
+		}
 		return stimuli;
 	}
 
