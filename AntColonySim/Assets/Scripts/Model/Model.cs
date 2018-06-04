@@ -6,7 +6,7 @@ using System;
 [System.Serializable]
 public class Model {
 	
-	public static float[] parameters = new float[] {0.05f,0.05f,0.2f,0.1f,0.15f,0.9f,0.5f,0.5f}; //alpha,beta,gamma,zeta,eta,kappa,nu,tau
+	public static float[] parameters = new float[] {0.05f,0.05f,0.2f,0.1f,0.15f,0.9f,0.5f,0.4f}; //alpha,beta,gamma,zeta,eta,kappa,nu,tau
 
 	private List<string> Sigma;
 	private List<string> Delta;
@@ -84,8 +84,8 @@ public class Model {
 		lastInput = curInput;
 		curInput = inputs;
 		if (timeSinceLastInput >= parameters [7]) {
-			Debug.Log ("[MESSAGE] Time is greater than Tau");
-			Debug.Log ("[MESSAGE] Number of states " + states.Count);
+			Debug.LogWarning ("[MESSAGE] Time is greater than Tau");
+			Debug.LogWarning ("[MESSAGE] Number of states " + states.Count);
 			if (curState.TransitionIsDefined (Symbol.Epsilon.GetName ())) {
 				Transition t = curState.GetTransitionOn (Symbol.Epsilon);
 				if (t.IsTemporary ()) {

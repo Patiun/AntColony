@@ -92,7 +92,7 @@ public class Creature_Brain : MonoBehaviour {
 		}
 		HandleDebug ();
 		if (count >= waitTime) {
-			HandleOutput (model.TakeInput (GetStimuli ()));
+			//HandleOutput (model.TakeInput (GetStimuli ()));
 		} else {
 			count++;
 		}
